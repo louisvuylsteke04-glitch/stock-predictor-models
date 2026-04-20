@@ -232,8 +232,8 @@ class handler(BaseHTTPRequestHandler):
                 close_aligned[split:][-n_chart:] * np.exp(test_preds[-n_chart:])
             ).round(2).tolist()
 
-            signal = np.where(test_preds > 0, 1.0, 0.0)
-            cum_strat = (np.exp(np.cumsum(signal * y_test)) - 1) * 100
+            strategy_signal = np.where(test_preds > 0, 1.0, 0.0)
+            cum_strat = (np.exp(np.cumsum(strategy_signal * y_test)) - 1) * 100
             cum_bh = (np.exp(np.cumsum(y_test)) - 1) * 100
             bt_dates = combined.index[split:].strftime("%Y-%m-%d").tolist()[::3]
             bt_strat = [round(x, 2) for x in cum_strat.tolist()[::3]]
