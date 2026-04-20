@@ -96,7 +96,7 @@ def monte_carlo_forecast(
     first_day_ret: float,
     hist_log_returns: np.ndarray,
     n_days: int = 60,
-    n_sims: int = 1000,
+    n_sims: int = 10000,
     seed: int = 42,
 ) -> np.ndarray:
     """
