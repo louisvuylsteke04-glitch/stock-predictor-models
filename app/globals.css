@@ -1,3 +1,49 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --font-sans: "Avenir Next", "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", "SFMono-Regular", "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+  --bg: #07111a;
+  --bg-elevated: rgba(10, 18, 27, 0.72);
+  --panel: rgba(8, 15, 24, 0.82);
+  --panel-border: rgba(148, 163, 184, 0.14);
+  --text: #e5eef5;
+  --muted: #8a9aab;
+  --line: rgba(120, 143, 165, 0.16);
+  --teal: #63e6d8;
+  --cyan: #6cc4ff;
+  --amber: #f6c46d;
+  --rose: #ff7e79;
+}
+
+html {
+  background:
+    radial-gradient(circle at top left, rgba(108, 196, 255, 0.18), transparent 28%),
+    radial-gradient(circle at top right, rgba(246, 196, 109, 0.16), transparent 24%),
+    linear-gradient(180deg, #08121b 0%, #050b12 52%, #04080d 100%);
+  color: var(--text);
+}
+
+body {
+  font-family: var(--font-sans), sans-serif;
+  background-image:
+    linear-gradient(rgba(99, 230, 216, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99, 230, 216, 0.05) 1px, transparent 1px);
+  background-size: 56px 56px;
+  color: var(--text);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.font-mono {
+  font-family: var(--font-mono), monospace;
+}
+
+::selection {
+  background: rgba(108, 196, 255, 0.28);
+  color: white;
+}
