@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Stock Predictor ML",
-  description: "ML-powered next-day stock price prediction dashboard",
+  description: "ML-powered next-day and forward stock forecast dashboard",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

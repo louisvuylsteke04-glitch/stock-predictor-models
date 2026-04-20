@@ -164,7 +164,7 @@ class handler(BaseHTTPRequestHandler):
             y_test = y[split:]
             dir_acc = float(np.mean(np.sign(y_test) == np.sign(test_preds)))
 
-            # Next-day prediction
+            # Next-day prediction for the point estimate
             last_X = np.nan_to_num(features.iloc[-1:].values.astype(float))
             next_ret = float(model.predict(scaler.transform(last_X))[0])
             current_price = float(close.iloc[-1])
@@ -190,6 +190,11 @@ class handler(BaseHTTPRequestHandler):
             # Stacking-friendly data: base + height for each band
             # outer band: p5 → p95; inner band: p25 → p75
             p5, p25, p50, p75, p95 = [pctiles[i] for i in range(5)]
+            signal_horizon_days = min(90, n_days)
+            signal_idx = signal_horizon_days - 1
+            signal_price = float(p50[signal_idx])
+            signal_return_pct = ((signal_price - current_price) / current_price) * 100
+            signal = "UP" if signal_return_pct > 0 else "DOWN"
 
             forecast = {
                 "dates": [d.strftime("%Y-%m-%d") for d in future_dates],
@@ -206,6 +211,10 @@ class handler(BaseHTTPRequestHandler):
                 "inner_height": (p75 - p25).round(2).tolist(),
                 "n_simulations": 1000,
                 "n_days": n_days,
+                "signal_horizon_days": signal_horizon_days,
+                "signal_price": round(signal_price, 2),
+                "signal_return_pct": round(signal_return_pct, 3),
+                "signal": signal,
             }
 
             # Historical context: last 45 days for the forecast chart
@@ -236,6 +245,10 @@ class handler(BaseHTTPRequestHandler):
                 "predicted_price": round(predicted_price, 2),
                 "predicted_return_pct": round(next_ret * 100, 3),
                 "direction": "UP" if next_ret > 0 else "DOWN",
+                "signal": signal,
+                "signal_horizon_days": signal_horizon_days,
+                "signal_price": round(signal_price, 2),
+                "signal_return_pct": round(signal_return_pct, 3),
                 "directional_accuracy": round(dir_acc, 4),
                 "chart": {
                     "dates": [d.strftime("%Y-%m-%d") for d in chart_idx],

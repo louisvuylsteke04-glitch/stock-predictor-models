@@ -29,6 +29,10 @@ interface Forecast {
   inner_height: number[];
   n_simulations: number;
   n_days: number;
+  signal_horizon_days: number;
+  signal_price: number;
+  signal_return_pct: number;
+  signal: "UP" | "DOWN";
 }
 
 interface PredictionData {
@@ -37,6 +41,10 @@ interface PredictionData {
   predicted_price: number;
   predicted_return_pct: number;
   direction: "UP" | "DOWN";
+  signal: "UP" | "DOWN";
+  signal_horizon_days: number;
+  signal_price: number;
+  signal_return_pct: number;
   directional_accuracy: number;
   chart: { dates: string[]; actual: number[]; predicted: number[] };
   backtest: { dates: string[]; strategy: number[]; buy_hold: number[] };
@@ -183,8 +191,10 @@ export default function Home() {
     ? Math.max(data.current_price, ...data.history.prices, ...data.forecast.p95) * 1.03
     : 100;
 
-  const isUp = data?.direction === "UP";
+  const nextDayUp = data ? data.predicted_price >= data.current_price : false;
+  const signalUp = data?.signal === "UP";
   const priceDiff = data ? data.predicted_price - data.current_price : 0;
+  const signalHorizonLabel = data ? `${data.signal_horizon_days}d` : "";
 
   // 30-day forecast stats
   const fc30 = data ? data.forecast.p50[Math.min(29, data.forecast.p50.length - 1)] : null;
@@ -202,7 +212,7 @@ export default function Home() {
             Stock Predictor <span className="text-blue-400">ML</span>
           </h1>
           <p className="text-slate-500 text-sm">
-            Gradient Boosting · Monte Carlo simulation · next-day + multi-week forecast
+            Gradient Boosting · Monte Carlo simulation · next-day estimate + forward forecast
           </p>
         </div>
 
@@ -277,18 +287,24 @@ export default function Home() {
         {data && !loading && (
           <div className="space-y-6">
 
-            {/* ── Row 1: next-day stat cards ── */}
+            {/* ── Row 1: price and signal stat cards ── */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <StatCard label="Current Price" value={`$${data.current_price.toFixed(2)}`} sub={data.ticker} accent="gray" />
               <StatCard
-                label="Predicted Tomorrow"
+                label="Next-Day Estimate"
                 value={`$${data.predicted_price.toFixed(2)}`}
                 sub={`${priceDiff >= 0 ? "+" : ""}$${priceDiff.toFixed(2)} · ${data.predicted_return_pct > 0 ? "+" : ""}${data.predicted_return_pct.toFixed(3)}%`}
-                accent={isUp ? "green" : "red"}
+                accent={nextDayUp ? "green" : "red"}
               />
-              <StatCard label="Signal" value={isUp ? "▲ BUY" : "▼ SELL"} sub="next trading day" accent={isUp ? "green" : "red"} large />
               <StatCard
-                label="Directional Accuracy"
+                label="Signal"
+                value={signalUp ? "▲ BUY" : "▼ SELL"}
+                sub={`${signalHorizonLabel} Monte Carlo median · $${data.signal_price.toFixed(2)} · ${data.signal_return_pct > 0 ? "+" : ""}${data.signal_return_pct.toFixed(3)}%`}
+                accent={signalUp ? "green" : "red"}
+                large
+              />
+              <StatCard
+                label="Next-Day Directional Accuracy"
                 value={`${(data.directional_accuracy * 100).toFixed(1)}%`}
                 sub={`+${((data.directional_accuracy - 0.5) * 100).toFixed(1)}pp vs random`}
                 accent="blue"
